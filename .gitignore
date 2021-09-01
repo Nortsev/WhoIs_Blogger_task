@@ -1,1 +1,5 @@
 .idea
+venv
+Task_1/database.db
+__pycache__
+.DS_Store
