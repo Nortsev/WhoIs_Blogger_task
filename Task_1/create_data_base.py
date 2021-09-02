@@ -55,8 +55,9 @@ def insert_products(conn):
             for data in datas['objects']:
                 table = (data['itemId'], data['price'])
                 cursor.execute(sql, table)
-    except:
-        print("Таблица уже заполненна ")
+        print("Данные в таблицу успешно занесенны")
+    except sqlite3.IntegrityError:
+        print("Данные данные уже имеются в таблице")
 
 
     conn.commit()
