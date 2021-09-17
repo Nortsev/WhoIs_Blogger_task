@@ -20,14 +20,18 @@ from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 import imageio
 
-'''Загрузка новостей'''
 
+def load_news(period: int, key: str):
+    """ Загрузка новостей
+    :params int period: Период выборки новостей
+    :params str key: Ключевое слово для поиска
+    : return list headings: Лист с заголовками новостей за указанный период
+    """
 
-def load_news():
     # Получение сегодняшней даты
     data = datetime.datetime.now()
     # Задание  периода 30 дней
-    period = datetime.datetime.now() - datetime.timedelta(days=30)
+    period = datetime.datetime.now() - datetime.timedelta(days=period)
     # Создание  списа для хранения скаченых новостей
     headings = []
     # Передача языка и региона в библиотеку Google News
@@ -35,7 +39,7 @@ def load_news():
     # Передача периода в в библиотеку Google News
     googlenews.set_time_range(data.strftime('%m/%d/%Y'), period.strftime('%m/%d/%Y'))
     # Передача ключевого слова для поиска
-    googlenews.search('Russia')
+    googlenews.search(key)
     # Получение результата
     googlenews.results()
     # Создание счётчика страниц i
@@ -55,10 +59,11 @@ def load_news():
     return headings
 
 
-"""Обрабока полученных новостей """
+def exclude_stop_words(txt_blob: TextBlob):
+    """ Обрабока полученных новостей
+    :params TextBlob txt_blob: текстовый обьект TextBlob
+    : return  dict usable_words: словарь слов с количтвом повторений"""
 
-
-def exclude_stop_words(txt_blob):
     # Определение регуляного выражения для выборки только слов
     regexp = re.compile('[^a-zA-Z-]+')
     # Создание словаря для результатов
@@ -80,10 +85,14 @@ def exclude_stop_words(txt_blob):
     return usable_words
 
 
-"""Генерация Word Cloud"""
+def generate_wc(words: list, image: str, file_name: str, max_count: int):
+    """ Генерация Word Cloud
+    :params list words: Отсортированный лист с зачниями слово:количество повторенний
+    :params str image: Имя файла в директории для маски
+    :params str file_name: Имя файла для сохранение результата
+    :params int max_count: Количество слов передавоемых в Word Cloud
+    : return  dict usable_words: словарь слов с количтвом повторений"""
 
-
-def generate_wc(words, image, file_name, max_count=50):
     # Импорт изображения в Word Cloud
     image = imageio.imread(image)
     # Настройка обькта Word Cloud
@@ -99,11 +108,11 @@ def generate_wc(words, image, file_name, max_count=50):
 
 
 def main():
-    blob_txt = TextBlob(''.join(load_news()))
+    blob_txt = TextBlob(''.join(load_news(30, 'Russia')))
     print("Формирование изображение Word Cloud")
     usable_words = exclude_stop_words(blob_txt).items()
     sorted_words = sorted(usable_words, key=itemgetter(1), reverse=True)
-    generate_wc(sorted_words, 'russia.png', 'out.png', 50)
+    generate_wc(sorted_words, 'russia.png', 'result.png', 50)
 
 
 if __name__ == '__main__':
