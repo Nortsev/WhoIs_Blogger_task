@@ -1,5 +1,6 @@
 import create_data_base
 
+# Выборка "В каком месяце года выручка от пользователей в возрастном диапазоне 35+ самая большая"
 sql_max = """SELECT strftime('%m %Y', date)as date , SUM(Items.price) as summ 
             FROM Purchases
             INNER JOIN Users ON Purchases.userId = Users.userId
@@ -8,6 +9,7 @@ sql_max = """SELECT strftime('%m %Y', date)as date , SUM(Items.price) as summ
             ORDER BY summ DESC 
             LIMIT 1"""
 
+# Выборка "Какой товар обеспечивает дает наибольший вклад в выручку за последний год"
 sql_top_Items = """ SELECT Purchases.itemId,SUM(Items.price) as summ 
                     FROM Purchases
                     INNER JOIN Items on Items.itemId = Purchases.itemId
@@ -16,6 +18,7 @@ sql_top_Items = """ SELECT Purchases.itemId,SUM(Items.price) as summ
                     ORDER BY summ DESC 
                     LIMIT 1"""
 
+# Выборка "Топ-3 товаров по выручке и их доля в общей выручке за любой год"
 sql_top_3 = """SELECT Items.itemid, SUM(Items.price),
                 SUM(Items.price) * 1.0 / SUM(SUM(Items.price)) OVER () as Fraction
                 FROM Purchases 
@@ -29,6 +32,9 @@ sql_top_3 = """SELECT Items.itemid, SUM(Items.price),
 
 
 def summ(min, max):
+    """ Функция для выборки "Какую сумму в среднем в месяц тратит:
+            - пользователи в возрастном диапазоне от 18 до 25 лет включительно
+            - пользователи в возрастном диапазоне от 26 до 35 лет включительно"""
     sql = f""" SELECT AVG(price)
                FROM Items 
                INNER JOIN Purchases ON Items.itemId = Purchases.itemId
@@ -38,12 +44,12 @@ def summ(min, max):
 
 
 def main():
-    #init connection
+    # Создание соеденения с базой данных
     conn = create_data_base.create_connection()
     create_data_base.insert_products(conn)
     cursor = conn.cursor()
     i = 1
-    #print result
+    # Вывод результатов
     result = cursor.execute(summ(18, 25))
     print(f'Средння сумма трат пользователей в возрастном диапазоне от 18 до 25 лет включительно ='
           f' {int(result.fetchone()[0])}p')

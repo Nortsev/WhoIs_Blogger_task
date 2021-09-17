@@ -1,7 +1,10 @@
 import sqlite3
 import json
 
+# Указание файла базы данных
 database_file = "database.db"
+
+# Определенние скрипта создания таблиц в базе данных
 sql_create = """ CREATE TABLE IF NOT EXISTS Users(
                         userId INTEGER PRIMARY KEY,
                         age INTEGER NOT NULL );
@@ -19,8 +22,9 @@ sql_create = """ CREATE TABLE IF NOT EXISTS Users(
                 price INTEGER
                 )"""
 
+
 def create_connection(database=database_file):
-    """Create and connection to database"""
+    """Создание и подключение к базе данных"""
     conn = None
     try:
         conn = sqlite3.connect(database)
@@ -32,7 +36,7 @@ def create_connection(database=database_file):
 
 
 def insert_products(conn):
-    """Insert data in data base"""
+    """Вставка данных в базу данных """
     try:
         cursor = conn.cursor()
         with open('data/table_purchases.json', 'r') as write:
